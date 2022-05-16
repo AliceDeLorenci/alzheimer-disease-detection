@@ -1,7 +1,6 @@
 import os
 import sys
 from glob import glob
-from tkinter import END
 import cv2 as cv
 from PIL import Image
 import numpy as np
@@ -38,20 +37,16 @@ id = 0
 for file in tqdm(new_files):
     id = file.split("_")[-1][:-4]
     idx = csv_file.index[csv_file["Image Data ID"] == id].to_list()[0]
-    filename = (
-        png_dir + file.split("/")[-1][:-4] + "_" + csv_file["Group"][idx] + ".png"
-    )
+    filename = png_dir + file.split("/")[-1][:-4] + "_" + csv_file["Group"][idx] + ".png"
 
     # converts to png
     # start = time.time()
     ds = pydicom.dcmread(file)
-    new_image = ds.pixel_array.astype(float)
-    scaled_image = (np.maximum(new_image, 0) / new_image.max()) * 255.0
-    scaled_image = np.uint8(scaled_image)
+    new_image = ds.pixel_array.astype(np.float32)
+    scaled_image = np.maximum(new_image, 0) / new_image.max()
     # end = time.time()
 
     # print("dcm to png:", end - start)
-
     # start = time.time()
     img = skullStripping(scaled_image)
     # end = time.time()
@@ -72,11 +67,10 @@ for file in tqdm(new_files):
     # converts to rgb
     # start = time.time()
     rgb_img = np.zeros((3, imgSitk.shape[0], imgSitk.shape[1]))
-    img[::] = imgSitk
+    rgb_img[::] = imgSitk
     rgb_img = np.transpose(rgb_img, [1, 2, 0])
     # end = time.time()
-
     # print("2rgb:", end - start)
 
     # saves image
-    cv.imwrite(filename, rgb_img)
+    cv.imwrite(filename, rgb_img * 255)
