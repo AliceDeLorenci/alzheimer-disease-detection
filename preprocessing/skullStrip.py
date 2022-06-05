@@ -1,3 +1,9 @@
+"""
+The following code was reproduced from:
+    https://github.com/KaueTND/Brain_Extraction_T1wMRI/blob/main/Workflow_jupyter.ipynb
+"""
+
+# libraries
 from PIL import Image
 from scipy import signal as sci
 import numpy as np
@@ -28,27 +34,6 @@ import time
 import cv2 as cv
 
 
-def gaussian(s, mu, cov):
-    d = len(s)  # dimension
-    n = np.prod(s)  # n. of samples (pixels)
-    x = np.indices(s).reshape((d, n))
-    xc = x - mu
-    k = 1.0 * xc * np.dot(np.linalg.inv(cov), xc)
-    k = np.sum(k, axis=0)  # the sum is only applied to the rows
-    g = (1.0 / ((2 * np.pi) ** (d / 2.0) * np.sqrt(np.linalg.det(cov)))) * np.exp(
-        -1.0 / 2 * k
-    )
-    return g.reshape(s)
-
-
-def magnitude_sobel(image):
-    Sv = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-    Sh = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-    fv = sc_conv(image, Sv, mode="same")
-    fh = sc_conv(image, Sh, mode="same")
-    return np.sqrt(fh**2 + fv**2)
-
-
 def save_without_spacing(nome, fig):
     import matplotlib.pyplot as plt
     from matplotlib.ticker import NullLocator
@@ -60,15 +45,7 @@ def save_without_spacing(nome, fig):
     plt.gca().yaxis.set_major_locator(NullLocator())
     plt.savefig(nome, bbox_inches="tight", pad_inches=0, dpi=fig.dpi)
 
-
-def three_segments(xa, xb, ya, yb):
-    parte1 = np.floor(np.arange(0, ya, ya / (xa + 1)))
-    parte2 = np.floor(np.arange(ya, yb, (yb - ya) / (xb - xa)))
-    parte3 = np.floor(np.arange(yb, 255, (255 - yb) / (255 - xb)))
-    mascara = np.hstack((parte1, parte2, parte3))
-    return mascara
-
-
+# remove background noise
 def remove_ruido_fundo(imagem, Ti=0):
     if Ti == 0:
         Ti = np.mean(imagem)
@@ -78,7 +55,7 @@ def remove_ruido_fundo(imagem, Ti=0):
 
     return [Ti, imagem * mascara]
 
-
+# adjust contrast
 def ajuste_contraste(img):
     A = img
     L = np.max(A.ravel())
@@ -90,7 +67,7 @@ def ajuste_contraste(img):
     Adiff = A - D
     return np.clip(A + Adiff, 0, 255)
 
-
+# image binarization, used to find conex components
 def binariza(imagem, Cerebro=True):
     if Cerebro:
         t = threshold_otsu(imagem)
@@ -101,15 +78,13 @@ def binariza(imagem, Cerebro=True):
     imagem_binaria[imagem_binaria > t] = 1
     return imagem_binaria
 
-
+# detect connected component border
 def detecta_borda_conexa(imagem_binaria):
-    cranio_convexo = convex_hull_image(
-        binary_fill_holes(imagem_binaria)
-    )  # preenche a imagem
+    cranio_convexo = convex_hull_image(binary_fill_holes(imagem_binaria))  # preenche a imagem
     borda_cranio = feature.canny(cranio_convexo)  # extrai a borda
     return borda_cranio
 
-
+# detect connected component
 def detecta_componente_conexa(imagem_binaria, mostrar_Passos=False):
     label_aux = morph.label(imagem_binaria)
     label_ret = morph.label(imagem_binaria)
@@ -137,9 +112,7 @@ def detecta_componente_conexa(imagem_binaria, mostrar_Passos=False):
         [IMX, IMY] = imagem_binaria.shape
 
         # Passo 3 - Detecção da Parte Central do Cérebro (sem fundo)
-        array_centro = label_ret[
-            IMX // 2 - 25 : IMX // 2 + 25, IMY // 2 - 25 : IMY // 2 + 25
-        ]
+        array_centro = label_ret[IMX // 2 - 25 : IMX // 2 + 25, IMY // 2 - 25 : IMY // 2 + 25]
         array_centro = array_centro[array_centro != tonalidade_fundo]
         max_centro = np.argmax(
             np.bincount(array_centro.ravel())
@@ -160,7 +133,7 @@ def detecta_componente_conexa(imagem_binaria, mostrar_Passos=False):
         label_ret = label_aux
     return [label_ret, tonalidade_fundo, array_centro]
 
-
+# extract connected component
 def extrai_maior_componente(LC, tonalidade_fundo, array_centro=0, mostrar_Passos=False):
     # print(type(array_centro))
     c1 = LC.copy()
@@ -180,9 +153,7 @@ def extrai_maior_componente(LC, tonalidade_fundo, array_centro=0, mostrar_Passos
 
     # Rerotulação das componentes conexas baseado na ocorrencia de pixels no centro
     if type(array_centro) == np.ndarray:
-        matriz_substituicao = np.isin(
-            c1, np.unique(array_centro[array_centro != tonalidade_fundo])
-        )
+        matriz_substituicao = np.isin(c1, np.unique(array_centro[array_centro != tonalidade_fundo]))
         c1_k = convex_hull_image(matriz_substituicao)
         if mostrar_Passos == True:
             plt.figure()
