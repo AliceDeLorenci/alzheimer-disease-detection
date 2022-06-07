@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def plot_confusion_matrix(y_true, y_pred, classes, save=False, file=None):
+def plot_confusion_matrix(y_true, y_pred, classes, save=False, path=None):
     pd.options.display.float_format = "{:,.4f}".format
 
     con_mat = tf.math.confusion_matrix(labels=y_true, predictions=y_pred).numpy()
@@ -27,7 +27,7 @@ def plot_confusion_matrix(y_true, y_pred, classes, save=False, file=None):
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     if save:
-        plt.savefig(file, bbox_inches="tight", dpi=300, pad_inches=0)
+        plt.savefig(path, bbox_inches="tight", dpi=300, pad_inches=0)
     plt.show()
 
     results[["Acurácia" , "Sensitividade", "Especificidade"]] = results[["Acurácia" , "Sensitividade", "Especificidade"]].astype(float)
