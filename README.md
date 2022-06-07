@@ -1,7 +1,7 @@
 This project was developed for the Machine Learning (SSC0276) course at the University of São Paulo (USP) by:
-- Alice Valença De Lorenci
-- Gabriel Soares Gama 
-- Marcos Antonio Victor Arce
+- Alice Valença De Lorenci - 11200289
+- Gabriel Soares Gama - 10716511
+- Marcos Antonio Victor Arce - 10684621
 
 The MRI dataset used was kindly provided by ADNI and anyone wishing to reproduce our results may apply for [access to the data](https://adni.loni.usc.edu/data-samples/access-data/).
 

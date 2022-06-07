@@ -1,4 +1,13 @@
 """
+SCC0276 — Machine Learning
+
+Project: Alzheimer disease detection
+
+Authors:
+- Alice Valença De Lorenci - 11200289
+- Gabriel Soares Gama - 10716511
+- Marcos Antonio Victor Arce - 10684621
+
 The following code was reproduced from:
     https://github.com/KaueTND/Brain_Extraction_T1wMRI/blob/main/Workflow_jupyter.ipynb
 """

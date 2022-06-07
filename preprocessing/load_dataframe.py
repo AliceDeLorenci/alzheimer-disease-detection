@@ -1,3 +1,14 @@
+"""
+SCC0276 — Machine Learning
+
+Project: Alzheimer disease detection
+
+Authors:
+- Alice Valença De Lorenci - 11200289
+- Gabriel Soares Gama - 10716511
+- Marcos Antonio Victor Arce - 10684621
+"""
+
 import numpy as np
 import pandas as pd
 
