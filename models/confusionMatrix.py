@@ -17,9 +17,18 @@ import numpy as np
 
 
 def plot_confusion_matrix(y_true, y_pred, classes, save=False, path=None):
+    """
+    Arguments:
+    - y_true: true labels
+    - y_pred: predicted labels
+    - classes: classes ordered as encoded
+    - save: whether to save the confusion matrix
+    - path: file where the confusion matrix will be saved if <save> is set to True
+    """
+
     pd.options.display.float_format = "{:,.4f}".format
 
-    # calculates confusion matrix and normalize
+    # compute confusion matrix and normalize
     con_mat = tf.math.confusion_matrix(labels=y_true, predictions=y_pred).numpy()
     con_mat_norm = np.around(con_mat.astype("float") / con_mat.sum(axis=1)[:, np.newaxis], decimals=2)
 

@@ -179,8 +179,15 @@ def extrai_maior_componente(LC, tonalidade_fundo, array_centro=0, mostrar_Passos
     c1_k = convex_hull_image(c1)
     return [c1, c1_k]
 
-
+# apply skull stripping flow
 def skullStripping(im1):
+    """
+    Arguments:
+    - im1: original png image (array format)
+
+    Return:
+    - img: skull stripped image
+    """
     # im1 = Image.open(fileName)
     img = np.array(im1)
     ruido = three_segments(220, 240, 50, 210)
