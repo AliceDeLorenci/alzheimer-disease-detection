@@ -10,16 +10,15 @@ class_code = {"AD": 0, "CN": 1, "EMCI": 2, "LMCI": 3}
 
 @tf.function
 def parse_function_aug(img_file, label):
-
-    # image input
+    # image input'
     image = tf.io.read_file(img_file)
     image = tf.image.decode_image(image, expand_animations=False, channels=3)
-    image = tf.image.resize(image, (224, 224))
+    image = tf.image.resize(image, (96, 96))
     image = tf.cast(image, tf.float32)
     image = tf.keras.applications.mobilenet_v2.preprocess_input(image)
 
     # print("img shape: ", tf.shape(image))
-    noise = tf.random.normal(shape=[224, 224], mean=0.0, stddev=0.02, dtype=tf.float32)
+    noise = tf.random.normal(shape=[96, 96], mean=0.0, stddev=0.02, dtype=tf.float32)
     # print("noise shape: ", tf.shape(noise))
 
     img_list = [tf.add(image[:, :, 0], noise), tf.add(image[:, :, 1], noise), tf.add(image[:, :, 2], noise)]
@@ -41,7 +40,7 @@ def parse_function(img_file, label):
     # image input
     image = tf.io.read_file(img_file)
     image = tf.image.decode_image(image, expand_animations=False, channels=3)
-    image = tf.image.resize(image, (224, 224))
+    image = tf.image.resize(image, (96, 96))
     image = tf.cast(image, tf.float32)
     image = tf.keras.applications.mobilenet_v2.preprocess_input(image)
 

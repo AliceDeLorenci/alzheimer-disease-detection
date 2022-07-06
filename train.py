@@ -58,44 +58,34 @@ tf.random.set_seed(0)
 # load full model
 cnn_encoder = MobileNetV2(input_shape=(224, 224, 3), include_top=False, pooling="max")
 x = Dense(4, activation="Softmax")(cnn_encoder.output)
-
 cnn_model = Model(inputs=cnn_encoder.inputs, outputs=x)
 # confirms that the parameters are trainable
 for layer in cnn_model.layers:
     layer.trainable = True
 
 image_path = "/home/gama/Documentos/datasets/MRI_AX/ADNI_PNGv2/"
-train_ds, val_ds, test_ds, class_weights = loadDataset(image_path)
+train_ds, val_ds, test_ds, class_weights = loadDataset(image_path, aug=False, batch_size=16)
 
-for img, label in train_ds:
-    print(img.shape)
-    print(label)
-    print(img.cpu().numpy().shape)
-    # cv.imshow("img", img.cpu().numpy()[0])
-    # cv.waitKey(0)
-    break
+# for img, label in train_ds:
+#     print(img.shape)
+#     print(label)
+#     print(img.cpu().numpy().shape)
+#     # cv.imshow("img", img.cpu().numpy()[0])
+#     # cv.waitKey(0)
+#     break
 
 print(cnn_model.summary())
 # compile the model
 initial_learning_rate = 0.0001
-# lr_scheduler = tf.keras.optimizers.schedules.PolynomialDecay(
-#     initial_learning_rate,
-#     10 * len(train_ds),
-#     end_learning_rate=0.0001,
-#     power=2.0,
-#     cycle=False,
-#     name=None,
-# )
 opt = keras.optimizers.Adam(learning_rate=0.0001)
 
 cnn_model.compile(optimizer=opt, loss="sparse_categorical_crossentropy", metrics=["accuracy"])
 
-
-tb_callback = tf.keras.callbacks.TensorBoard("./logs/w_batch4_normal_res_DataAug", update_freq=1)
+tb_callback = tf.keras.callbacks.TensorBoard("./logs/w_batch4_normal_res_noDataAug", update_freq=1)
 
 monitor_val_acc = EarlyStopping(monitor="val_loss", patience=3)
 history = cnn_model.fit(
     train_ds, validation_data=val_ds, epochs=15, verbose=1, callbacks=[tb_callback, monitor_val_acc], class_weight=class_weights
 )
 
-cnn_model.save("w_CNN_batch4_normal_res_DataAug.h5")
+cnn_model.save("w_CNN_batch4_normal_res_noDataAug.h5")

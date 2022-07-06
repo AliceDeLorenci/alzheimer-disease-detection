@@ -93,25 +93,54 @@ def plot_confusion_matrix(y_true, y_pred, classes, save=False, file=None):
     results[["Acurácia", "Sensitividade", "Especificidade"]] = results[["Acurácia", "Sensitividade", "Especificidade"]].astype(
         float
     )
+
     print(results)
+
+
+# function for scoring roc auc score for multi-class
+def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
+    lb = LabelBinarizer()
+    lb.fit(y_test)
+    y_test = lb.transform(y_test)
+
+    for (idx, c_label) in enumerate(target):
+        fpr, tpr, thresholds = roc_curve(y_test[:, idx].astype(int), y_pred[:, idx])
+        c_ax.plot(fpr, tpr, label="%s (AUC:%0.2f)" % (c_label, auc(fpr, tpr)))
+    c_ax.plot(fpr, fpr, "b-", label="Random Guessing")
+    return roc_auc_score(y_test, y_pred, average=average)
 
 
 image_path = "/home/gama/Documentos/datasets/MRI_AX/ADNI_PNGv2/"
 
 train_ds, val_ds, test_ds, class_weights = loadDataset(image_path)
 
-model_path = "CNN_batch16_low_res_noDataAug"
-# model_path = "CNN_batch16_low_res_DataAug"
-# model_path = "CNN_low_batch_normal_res_noDataAug"
-# model_path = "CNN_batch4_normal_res_DataAug"
+model_path = "w_CNN_batch16_low_res_noDataAug"
+# model_path = "w_CNN_batch16_low_res_DataAug"
+# model_path = "w_CNN_batch4_normal_res_noDataAug"
+# model_path = "w_CNN_batch4_normal_res_DataAug"
 
 model = keras.models.load_model(model_path + ".h5")
 # evaluate the model
 print("\nEvaluate model")
 loss, acc = model.evaluate(test_ds, verbose=1)
-print("Test Accuracy: %.3f" % acc)
+print("Test Accuracy: %.4f" % acc)
 y_pred = model.predict(test_ds)
 
 y_test = np.concatenate([y for x, y in test_ds], axis=0)
 
-plot_confusion_matrix(y_test, np.argmax(y_pred, axis=1), list(class_code.keys()), save=True, file=model_path + "_cm.pdf")
+plot_confusion_matrix(y_test, np.argmax(y_pred, axis=1), list(class_code.keys()), save=True, file=model_path + "_cm.png")
+
+target = list(class_code.keys())
+
+# set plot figure size
+fig, c_ax = plt.subplots(1, 1, figsize=(12, 8))
+
+
+print("ROC AUC score:", multiclass_roc_auc_score(y_test, y_pred))
+
+c_ax.legend()
+c_ax.set_xlabel("False Positive Rate")
+c_ax.set_ylabel("True Positive Rate")
+plt.savefig(model_path + "roc.png", bbox_inches="tight", dpi=300, pad_inches=0)
+
+plt.show()
