@@ -5,7 +5,7 @@ This project was developed for the Machine Learning (SSC0276) course at the Univ
 
 The MRI dataset used was kindly provided by ADNI and anyone wishing to reproduce our results may apply for [access to the data](https://adni.loni.usc.edu/data-samples/access-data/).
 
-The code is organized in the folders ```data```, ```models``` and ```preprocessing```, and the relevant files are:
+The code is organized in the folders ```data```, ```models```, ```mobileNet``` and ```preprocessing```, and the relevant files are:
 - ```preprocessing```:
   - ```preprocessing.ipynb```: preprocessing flow applied to the data
   - ```feature_extraction.ipynb```: feature extraction using a CNN pre-trained on the ImageNet database
@@ -17,5 +17,9 @@ The code is organized in the folders ```data```, ```models``` and ```preprocessi
   - ```KNN.ipynb```: KNN model
   - ```MultilayerPerceptron.ipynb```: multilayer perceptron model
   - ```SVM.ipynb```: SVM model
+- ```mobileNet```:
+  - ```dataloader.py```: loads the images in the required format for MobileNetV2
+  - ```train.py```: MobileNetV2 model
+  - ```eval.py```: evaluation metrics
 
   
